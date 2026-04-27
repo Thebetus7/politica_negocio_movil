@@ -25,7 +25,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     try {
       final res = await dio.get(
-        'http://10.0.2.2:8080/api/auth/me',
+        'http://10.0.2.2:8081/api/auth/me',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
       if (res.statusCode == 200) {
