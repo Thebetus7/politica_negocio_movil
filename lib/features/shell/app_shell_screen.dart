@@ -118,6 +118,8 @@ class _AppShellScreenState extends State<AppShellScreen> {
     final role = session?.rol ?? AppRole.administrador;
     final navItems = navItemsForRole(role);
     final tabs = session != null ? _tabsForRole(role, session) : <Widget>[];
+    final safeIndex = _currentIndex.clamp(0, navItems.length - 1);
+    final currentTitle = navItems.isNotEmpty ? (navItems[safeIndex].label ?? 'DASHBOARD') : 'DASHBOARD';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -125,9 +127,9 @@ class _AppShellScreenState extends State<AppShellScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'DASHBOARD',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+        title: Text(
+          currentTitle.toUpperCase(),
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, letterSpacing: 1.5),
         ),
         actions: [
           IconButton(

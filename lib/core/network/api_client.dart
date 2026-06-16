@@ -31,13 +31,15 @@ class ApiClient {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          options.headers['Accept'] = 'application/json';
+          if (options.path == 'health') {
+            return handler.next(options);
+          }
           final prefs = await SharedPreferences.getInstance();
           final token = prefs.getString('auth_token');
           if (token != null) {
-            options.headers['Authorization'] =
-                'Bearer $token'; // Usable backend Dummy Auth
+            options.headers['Authorization'] = 'Bearer $token';
           }
-          options.headers['Accept'] = 'application/json';
           return handler.next(options);
         },
         onError: (DioException e, handler) async {
@@ -95,7 +97,7 @@ class ApiClient {
   Future<HealthCheckResult> checkHealth() async {
     try {
       final response = await dio.get(
-        '/health',
+        'health',
         options: Options(
           receiveTimeout: const Duration(seconds: 6),
           followRedirects: false,
@@ -157,7 +159,7 @@ class ApiClient {
   Future<bool?> checkEmailExists(String correo) async {
     try {
       final response = await dio.get(
-        '/auth/exists',
+        'auth/exists',
         queryParameters: {'correo': correo},
         options: Options(
           receiveTimeout: const Duration(seconds: 6),
@@ -199,8 +201,9 @@ String _resolveBaseUrl() {
   // Safe defaults:
   // - localhost works on desktop/web
   // - 10.0.2.2 works on Android emulator
-   return 'https://npwch9fd-8081.brs.devtunnels.ms/api';
-  //return 'http://localhost:8081/api';
+  //return _normalizeBaseUrl('http://10.0.2.2:8081/api');
+  return _normalizeBaseUrl('http://18.188.140.140:8081/api');
+
 }
 
 bool _isValidHttpUrl(String value) {
@@ -211,5 +214,6 @@ bool _isValidHttpUrl(String value) {
 
 String _normalizeBaseUrl(String value) {
   final noTrailingSlash = value.endsWith('/') ? value.substring(0, value.length - 1) : value;
-  return noTrailingSlash.endsWith('/api') ? noTrailingSlash : '$noTrailingSlash/api';
+  final withApi = noTrailingSlash.endsWith('/api') ? noTrailingSlash : '$noTrailingSlash/api';
+  return '$withApi/';
 }

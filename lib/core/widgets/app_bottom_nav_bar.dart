@@ -16,25 +16,30 @@ class AppBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final safeIndex = currentIndex.clamp(0, items.length - 1);
 
-    return SafeArea(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: const [
-            BoxShadow(color: Colors.black26, offset: Offset(0, 4), blurRadius: 10),
-          ],
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 4),
           child: BottomNavigationBar(
             elevation: 0,
             backgroundColor: Colors.transparent,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white54,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
+            selectedItemColor: Colors.blue.shade400,
+            unselectedItemColor: Colors.white70,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
+            showSelectedLabels: true,
+            showUnselectedLabels: true,
             type: BottomNavigationBarType.fixed,
             currentIndex: safeIndex,
             onTap: onTap,

@@ -140,8 +140,8 @@ class _LoginScreenState extends State<LoginScreen> {
     required String password,
   }) async {
     final base = _apiClient.dio.options.baseUrl.toLowerCase();
-    final primaryPath = '/auth/login';
-    final fallbackPath = base.endsWith('/api') ? null : '/api/auth/login';
+    final primaryPath = 'auth/login';
+    final fallbackPath = base.contains('/api') ? null : 'api/auth/login';
 
     try {
       return await _apiClient.dio.post(primaryPath, data: {
@@ -235,7 +235,17 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 20),
             TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Correo')),
             TextField(controller: _passController, decoration: const InputDecoration(labelText: 'Contraseña'), obscureText: true),
-            const SizedBox(height: 20),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  _emailController.text = 'atencion1@example.com';
+                  _passController.text = 'password';
+                },
+                child: const Text('Llenar Atención al Cliente', style: TextStyle(color: Colors.amber)),
+              ),
+            ),
+            const SizedBox(height: 10),
             if (_error.isNotEmpty)
               Container(
                 width: double.infinity,
