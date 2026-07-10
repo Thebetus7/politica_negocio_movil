@@ -204,7 +204,7 @@ String _resolveBaseUrl() {
   // - Móvil físico (misma WiFi): Reemplazar por la IP LAN local de tu PC (ej: http://192.168.1.50:8081/api)
   // return _normalizeBaseUrl('http://192.168.1.100:8081/api');
   // return _normalizeBaseUrl('http://10.0.2.2:8081/api');
-  return _normalizeBaseUrl('http://18.118.29.153:8081/api');
+  return _normalizeBaseUrl('http://192.168.149.2:8081/api');
 }
 
 bool _isValidHttpUrl(String value) {

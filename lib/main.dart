@@ -20,15 +20,42 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Política Móvil',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
+        fontFamily: 'Inter',
+        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF000000),
+          onPrimary: Color(0xFFFFFFFF),
+          secondary: Color(0xFFF0F0F0),
+          onSecondary: Color(0xFF000000),
+          surface: Color(0xFFFFFFFF),
+          onSurface: Color(0xFF000000),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFFFFFFF),
+          foregroundColor: Color(0xFF000000),
+          elevation: 0,
+          scrolledUnderElevation: 0,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF000000),
+            foregroundColor: const Color(0xFFFFFFFF),
+            elevation: 0,
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          ),
+        ),
+        splashFactory: NoSplash.splashFactory,
+        highlightColor: Colors.transparent,
       ),
       initialRoute: initialRoute,
       routes: {
-        '/login': (context) => LoginScreen(),
+        '/login': (context) => const LoginScreen(),
         '/dashboard': (context) => const AppShellScreen(),
       },
     );
   }
 }
+

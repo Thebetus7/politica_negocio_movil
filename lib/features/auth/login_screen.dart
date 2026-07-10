@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/network/api_client.dart';
+import '../../core/widgets/app_design_system.dart';
 import '../shell/app_shell_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,32 +20,16 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passController = TextEditingController();
   final ApiClient _apiClient = ApiClient();
   bool _isLoading = false;
-  String _error = "";
-
-  bool _checkingConnection = true;
-  bool _isConnected = false;
-  String _connectionMessage = 'Verificando conexión...';
+  bool _obscurePassword = true;
+  String _error = '';
 
   @override
   void initState() {
     super.initState();
-    _verifyConnection();
-  }
-
-  Future<void> _verifyConnection() async {
-    setState(() {
-      _checkingConnection = true;
-      _connectionMessage = 'Verificando conexión...';
-    });
-
-    final result = await _apiClient.checkHealth();
-
-    if (!mounted) return;
-    setState(() {
-      _checkingConnection = false;
-      _isConnected = result.connected;
-      _connectionMessage = result.message;
-    });
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
   }
 
   void _login() async {
@@ -51,15 +37,13 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passController.text;
 
     if (correo.isEmpty || password.isEmpty) {
-      setState(() {
-        _error = 'Completa correo y contraseña.';
-      });
+      setState(() => _error = 'Completa correo y contraseña.');
       return;
     }
 
     setState(() {
       _isLoading = true;
-      _error = "";
+      _error = '';
     });
 
     final reachable = await _apiClient.isServerReachable();
@@ -78,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final data = response.data as Map<String, dynamic>;
       final token = data['token'] as String?;
       if (token == null || token.isEmpty) {
-        setState(() => _error = "Credenciales inválidas");
+        setState(() => _error = 'Credenciales inválidas');
         return;
       }
 
@@ -98,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _error = message);
     } catch (_) {
       if (!mounted) return;
-      setState(() => _error = "Error inesperado al iniciar sesión.");
+      setState(() => _error = 'Error inesperado al iniciar sesión.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -140,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
     required String password,
   }) async {
     final base = _apiClient.dio.options.baseUrl.toLowerCase();
-    final primaryPath = 'auth/login';
+    const primaryPath = 'auth/login';
     final fallbackPath = base.contains('/api') ? null : 'api/auth/login';
 
     try {
@@ -164,115 +148,139 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Widget _buildConnectionBanner() {
-    final Color bg;
-    final Color fg;
-    final IconData icon;
-
-    if (_checkingConnection) {
-      bg = Colors.amber.shade50;
-      fg = Colors.amber.shade800;
-      icon = Icons.sync;
-    } else if (_isConnected) {
-      bg = Colors.green.shade50;
-      fg = Colors.green.shade800;
-      icon = Icons.check_circle;
-    } else {
-      bg = Colors.red.shade50;
-      fg = Colors.red.shade800;
-      icon = Icons.error;
-    }
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: fg.withOpacity(0.4)),
-      ),
-      child: Row(
-        children: [
-          if (_checkingConnection)
-            SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(strokeWidth: 2, color: fg),
-            )
-          else
-            Icon(icon, color: fg, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              _connectionMessage,
-              style: TextStyle(color: fg, fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-          ),
-          if (!_checkingConnection)
-            IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              icon: Icon(Icons.refresh, color: fg, size: 20),
-              tooltip: 'Reintentar',
-              onPressed: _verifyConnection,
-            ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login - Móvil')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 40),
-            _buildConnectionBanner(),
-            const SizedBox(height: 20),
-            TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Correo')),
-            TextField(controller: _passController, decoration: const InputDecoration(labelText: 'Contraseña'), obscureText: true),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  _emailController.text = 'atencion1@example.com';
-                  _passController.text = 'password';
-                },
-                child: const Text('Llenar Atención al Cliente', style: TextStyle(color: Colors.amber)),
-              ),
-            ),
-            const SizedBox(height: 10),
-            if (_error.isNotEmpty)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red.shade200),
+      backgroundColor: AppColors.neutral,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Logo / Título
+              const SizedBox(height: AppSpacing.xxl),
+              Center(
+                child: Column(
+                  children: [
+                    const Text(
+                      'POLITICA',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 40,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.primary,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'GESTIÓN DE POLÍTICAS DE NEGOCIO',
+                      style: AppTextStyles.label,
+                    ),
+                  ],
                 ),
+              ),
+
+              const SizedBox(height: AppSpacing.xxl),
+
+              // Campos del formulario
+              Text('CORREO ELECTRÓNICO', style: AppTextStyles.label),
+              const SizedBox(height: AppSpacing.sm),
+              TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                style: AppTextStyles.body.copyWith(color: AppColors.primary),
+                decoration: AppDecorations.inputDecoration(
+                  labelText: '',
+                  hintText: 'nombre@organizacion.com',
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.lg),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('CONTRASEÑA', style: AppTextStyles.label),
+                  GestureDetector(
+                    onTap: () {
+                      _emailController.text = 'atencion1@example.com';
+                      _passController.text = 'password';
+                    },
+                    child: Text(
+                      'USAR DEMO',
+                      style: AppTextStyles.label.copyWith(
+                        color: AppColors.primary,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              TextField(
+                controller: _passController,
+                obscureText: _obscurePassword,
+                style: AppTextStyles.body.copyWith(color: AppColors.primary),
+                decoration: AppDecorations.inputDecoration(
+                  labelText: '',
+                  hintText: '••••••••',
+                  suffixIcon: GestureDetector(
+                    onTap: () => setState(() => _obscurePassword = !_obscurePassword),
+                    child: Icon(
+                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      color: AppColors.tertiary,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+
+              // Error
+              if (_error.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.md),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  color: AppColors.disconnectedBg,
+                  child: Text(
+                    _error.toUpperCase(),
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 11,
+                      color: AppColors.disconnected,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: AppSpacing.xl),
+
+              // Botón login
+              AppPrimaryButton(
+                label: 'INICIAR SESIÓN →',
+                onPressed: _login,
+                isLoading: _isLoading,
+              ),
+
+              // URL del servidor
+              const SizedBox(height: AppSpacing.xxl),
+              const AppDivider(),
+              const SizedBox(height: AppSpacing.md),
+              Center(
                 child: Text(
-                  _error,
-                  style: const TextStyle(color: Colors.red, fontSize: 13),
+                  'SERVIDOR  ${_apiClient.dio.options.baseUrl}',
+                  style: AppTextStyles.caption,
+                  textAlign: TextAlign.center,
                 ),
               ),
-            const SizedBox(height: 20),
-            _isLoading 
-              ? const CircularProgressIndicator()
-              : ElevatedButton(onPressed: _login, child: const Text('Entrar')),
-            const SizedBox(height: 16),
-            Text(
-              'API: ${_apiClient.dio.options.baseUrl}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, color: Colors.black54),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.lg),
+            ],
+          ),
         ),
-      )
+      ),
     );
   }
 }

@@ -7,6 +7,7 @@ import '../../core/models/role_helpers.dart';
 import '../../core/models/user_session.dart';
 import '../../core/network/api_client.dart';
 import '../../core/widgets/app_bottom_nav_bar.dart';
+import '../../core/widgets/app_design_system.dart';
 import '../actividades/actividades_screen.dart';
 import '../auth/login_screen.dart';
 import '../dashboard/dashboard_home_screen.dart';
@@ -122,35 +123,55 @@ class _AppShellScreenState extends State<AppShellScreen> {
     final currentTitle = navItems.isNotEmpty ? (navItems[safeIndex].label ?? 'DASHBOARD') : 'DASHBOARD';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.neutral,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.neutral,
         elevation: 0,
-        centerTitle: true,
-        title: Text(
-          currentTitle.toUpperCase(),
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleSpacing: AppSpacing.lg,
+        title: const Text(
+          'ARCHIVE',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            fontWeight: FontWeight.w900,
+            color: AppColors.primary,
+            letterSpacing: 3,
+          ),
         ),
         actions: [
+          // Indicador de sección actual
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            child: Center(
+              child: Text(
+                currentTitle.toUpperCase(),
+                style: AppTextStyles.label,
+              ),
+            ),
+          ),
+          // Botón logout
           IconButton(
-            icon: const Icon(Icons.exit_to_app, color: Colors.black),
+            icon: const Icon(Icons.logout, color: AppColors.tertiary, size: 18),
             onPressed: _logout,
+            tooltip: 'Cerrar sesión',
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: AppColors.secondary, height: 1),
+        ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primary,
+                strokeWidth: 1.5,
+              ),
+            )
           : _error.isNotEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(_error),
-                      const SizedBox(height: 16),
-                      ElevatedButton(onPressed: _loadSession, child: const Text('Reintentar')),
-                    ],
-                  ),
-                )
+              ? _buildErrorState()
               : IndexedStack(
                   index: _currentIndex.clamp(0, tabs.length - 1),
                   children: tabs,
@@ -162,6 +183,31 @@ class _AppShellScreenState extends State<AppShellScreen> {
               onTap: (index) => setState(() => _currentIndex = index),
               items: navItems,
             ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('ERROR', style: AppTextStyles.label),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              _error,
+              style: AppTextStyles.body.copyWith(color: AppColors.primary),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            AppSecondaryButton(
+              label: 'Reintentar',
+              onPressed: _loadSession,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

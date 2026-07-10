@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/widgets/app_design_system.dart';
+
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -17,27 +19,33 @@ class AppBottomNavBar extends StatelessWidget {
     final safeIndex = currentIndex.clamp(0, items.length - 1);
 
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.black,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+      decoration: const BoxDecoration(
+        color: AppColors.primary,
+        border: Border(
+          top: BorderSide(color: AppColors.primary, width: 1),
+        ),
       ),
       child: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
+        child: SizedBox(
+          height: 60,
           child: BottomNavigationBar(
             elevation: 0,
             backgroundColor: Colors.transparent,
-            selectedItemColor: Colors.blue.shade400,
-            unselectedItemColor: Colors.white70,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 11),
+            selectedItemColor: AppColors.neutral,
+            unselectedItemColor: AppColors.tertiary,
+            selectedLabelStyle: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w700,
+              fontSize: 9,
+              letterSpacing: 1,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w400,
+              fontSize: 9,
+              letterSpacing: 1,
+            ),
             showSelectedLabels: true,
             showUnselectedLabels: true,
             type: BottomNavigationBarType.fixed,
