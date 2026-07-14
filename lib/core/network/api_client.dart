@@ -204,7 +204,7 @@ String _resolveBaseUrl() {
   // - Móvil físico (misma WiFi): Reemplazar por la IP LAN local de tu PC (ej: http://192.168.1.50:8081/api)
   // return _normalizeBaseUrl('http://192.168.1.100:8081/api');
   // return _normalizeBaseUrl('http://10.0.2.2:8081/api');
-  return _normalizeBaseUrl('http://192.168.149.2:8081/api');
+  return _normalizeBaseUrl('http://9e3aoi-ip-189-28-70-68.tunnelmole.net/api');
 }
 
 bool _isValidHttpUrl(String value) {
